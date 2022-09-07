@@ -120,7 +120,7 @@ class AlbumsRepository
   # Add more methods below for each operation youd like to implement.
 
   # def create(album)
-  #INSERT
+  INSERT INTO students (name, cohort_name) VALUES ($1, $2);
   # end
 
   # def update(album)

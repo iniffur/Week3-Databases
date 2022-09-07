@@ -29,10 +29,28 @@ RSpec.describe AlbumRepository do
     it "Returns first album: Bossanova" do
         repo = AlbumRepository.new
 
-            album = repo.find(1)
+        album = repo.find(1)
 
-            expect(album.title).to eq 'Bossanova'
-            expect(album.release_year).to eq '1999'
-            expect(album.artist_id).to eq '1'
+        expect(album.title).to eq 'Bossanova'
+        expect(album.release_year).to eq '1999'
+        expect(album.artist_id).to eq '1'
+    end
+
+    it "Creates a new album" do
+        repo = AlbumRepository.new
+        album = Album.new
+
+        album.title = 'Trompe le Monde'
+        album.release_year = '1991'
+        album.artist_id = '1'
+
+        repo.create(album)
+        albums = repo.all
+
+        last_album = albums.last
+
+        expect(last_album.title).to eq 'Trompe le Monde'
+        expect(last_album.release_year).to eq '1991'
+        expect(last_album.artist_id).to eq '1'
     end
 end
