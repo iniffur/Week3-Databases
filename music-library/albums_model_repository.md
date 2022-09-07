@@ -1,22 +1,22 @@
-{{TABLE NAME}} Model and Repository Classes Design Recipe
+{Albums} Model and Repository Classes Design Recipe
 Copy this recipe template to design and implement Model and Repository classes for a database table.
 
 1. Design and create the Table
-If the table is already created in the database, you can skip this step.
+   If the table is already created in the database, you can skip this step.
 
 Otherwise, follow this recipe to design and create the SQL schema for your table.
 
-In this template, we'll use an example table students
+In this template, we'll use an example table artists
 
 # EXAMPLE
 
-Table: students
+Table: albums
 
 Columns:
-id | name | cohort_name
+id | title | release_year | artist_id
 
 2. Create Test SQL seeds
-Your tests will depend on data stored in PostgreSQL to run.
+   Your tests will depend on data stored in PostgreSQL to run.
 
 If seed data is provided (or you already created it), you can skip this step.
 
@@ -24,19 +24,23 @@ If seed data is provided (or you already created it), you can skip this step.
 -- EXAMPLE
 -- (file: spec/seeds_{table_name}.sql)
 
--- Write your SQL seed here. 
+-- Write your SQL seed here.
 
 -- First, you'd need to truncate the table - this is so our table is emptied between each test run,
 -- so we can start with a fresh state.
 -- (RESTART IDENTITY resets the primary key)
 
-TRUNCATE TABLE students RESTART IDENTITY; -- replace with your own table name.
+TRUNCATE TABLE artists RESTART IDENTITY;
+TRUNCATE TABLE albums RESTART IDENTITY; -- replace with your own table name.
 
 -- Below this line there should only be `INSERT` statements.
 -- Replace these statements with your own seed data.
 
-INSERT INTO students (name, cohort_name) VALUES ('David', 'April 2022');
-INSERT INTO students (name, cohort_name) VALUES ('Anna', 'May 2022');
+INSERT INTO artists (name, genre) VALUES ('Pixies', 'Rock')
+INSERT INTO albums (title, release_year, artist_id) VALUES ('Bossanova', '1999', '1');
+INSERT INTO albums (title, release_year, artist_id) VALUES ('Surfer Rosa', '2001', '1');
+
+
 
 Run this SQL file on the database to truncate (empty) the table, and insert the seed data. Be mindful of the fact any existing records in the table will be deleted.
 
@@ -46,82 +50,85 @@ psql -h 127.0.0.1 your_database_name < seeds_{table_name}.sql
 Usually, the Model class name will be the capitalised table name (single instead of plural). The same name is then suffixed by Repository for the Repository class name.
 
 # EXAMPLE
-# Table name: students
+# Table name: albums
 
 # Model class
-# (in lib/student.rb)
-class Student
+# (in lib/album.rb)
+class Album
 end
 
 # Repository class
-# (in lib/student_repository.rb)
-class StudentRepository
+# (in lib/album_repository.rb)
+class AlbumRepository
 end
 
 4. Implement the Model class
 Define the attributes of your Model class. You can usually map the table columns to the attributes of the class, including primary and foreign keys.
 
 # EXAMPLE
-# Table name: students
+# Table name: albums
 
 # Model class
-# (in lib/student.rb)
+# (in lib/album.rb)
 
-class Student
+class Album
 
   # Replace the attributes by your own columns.
-  attr_accessor :id, :name, :cohort_name
+  attr_accessor :id, :title, :release_year, :artist_id
 end
 
 # The keyword attr_accessor is a special Ruby feature
 # which allows us to set and get attributes on an object,
-# here's an example:
+# heres an example:
 #
-# student = Student.new
-# student.name = 'Jo'
-# student.name
+# album = Album.new
+# album.title = 'Bossanova'
+# album.title
 You may choose to test-drive this class, but unless it contains any more logic than the example above, it is probably not needed.
 
 5. Define the Repository Class interface
-Your Repository class will need to implement methods for each "read" or "write" operation you'd like to run against the database.
+Your Repository class will need to implement methods for each "read" or "write" operation youd like to run against the database.
 
 Using comments, define the method signatures (arguments and return value) and what they do - write up the SQL queries that will be used by each method.
 
 # EXAMPLE
-# Table name: students
+# Table name: albums
 
 # Repository class
-# (in lib/student_repository.rb)
+# (in lib/albums.rb)
 
-class StudentRepository
+class AlbumsRepository
 
   # Selecting all records
   # No arguments
   def all
     # Executes the SQL query:
-    # SELECT id, name, cohort_name FROM students;
+    # SELECT * FROM albums;
 
-    # Returns an array of Student objects.
+    # Returns an array of Albums objects.
   end
 
   # Gets a single record by its ID
   # One argument: the id (number)
   def find(id)
     # Executes the SQL query:
-    # SELECT id, name, cohort_name FROM students WHERE id = $1;
+    # SELECT * FROM artists WHERE id = $1;
 
-    # Returns a single Student object.
+    # Returns a single Album object.
   end
 
-  # Add more methods below for each operation you'd like to implement.
+  # Add more methods below for each operation youd like to implement.
 
-  # def create(student)
+  # def create(album)
+  #INSERT
   # end
 
-  # def update(student)
+  # def update(album)
+  #UPDATE
   # end
 
-  # def delete(student)
+  # def delete(album)
+  #DELETE
   # end
 end
 
@@ -133,32 +140,35 @@ These examples will later be encoded as RSpec tests.
 # EXAMPLES
 
 # 1
-# Get all students
+# Get all albums
 
-repo = StudentRepository.new
+repo = AlbumRepository.new
 
-students = repo.all
+albums = repo.all
 
-students.length # =>  2
+albums.length # =>  2
 
-students[0].id # =>  1
-students[0].name # =>  'David'
-students[0].cohort_name # =>  'April 2022'
+albums[0].id # =>  1
+albums[0].title # =>  'Bossanova'
+albums[0].release_year # =>  '1999'
+albums[0].artist_id # =>  '1'
 
-students[1].id # =>  2
-students[1].name # =>  'Anna'
-students[1].cohort_name # =>  'May 2022'
+albums[1].id # =>  2
+albums[1].title # =>  'Surfer Rosa'
+albums[1].release_year # =>  '2001'
+albums[1].artist_id # =>  '1'
 
 # 2
-# Get a single student
+# Get a single album
 
-repo = StudentRepository.new
+repo = AlbumRepository.new
 
-student = repo.find(1)
+album = repo.find(1)
 
-student.id # =>  1
-student.name # =>  'David'
-student.cohort_name # =>  'April 2022'
+album.id # =>  1
+album.title # =>  'Bossanova'
+album.release_year # =>  '1999'
+album.artist_id # => 1
 
 # Add more examples for each method
 Encode this example as a test.
@@ -170,17 +180,17 @@ This is so you get a fresh table contents every time you run the test suite.
 
 # EXAMPLE
 
-# file: spec/student_repository_spec.rb
+# file: spec/album_repository_spec.rb
 
-def reset_students_table
-  seed_sql = File.read('spec/seeds_students.sql')
-  connection = PG.connect({ host: '127.0.0.1', dbname: 'students' })
+def reset_albums_table
+  seed_sql = File.read('spec/seeds_albums.sql')
+  connection = PG.connect({ host: '127.0.0.1', dbname: 'albums' })
   connection.exec(seed_sql)
 end
 
-describe StudentRepository do
-  before(:each) do 
-    reset_students_table
+describe AlbumRepository do
+  before(:each) do
+    reset_album_table
   end
 
   # (your tests will go here).
@@ -188,4 +198,4 @@ end
 
 8. Test-drive and implement the Repository class behaviour
 After each test you write, follow the test-driving process of red, green, refactor to implement the behaviour.
-
+```
