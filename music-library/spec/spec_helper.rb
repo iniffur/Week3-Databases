@@ -1,7 +1,6 @@
 require 'database_connection'
 DatabaseConnection.connect('music_library_test')
 
-
 # Make sure this connects to your test database
 # (its name should end with '_test')
 
